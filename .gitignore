@@ -1,0 +1,41 @@
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ── Editor / IDE ──────────────────────────────────────────────────────────────
+*.code-workspace
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ── Node (build tools, if added later) ────────────────────────────────────────
+node_modules/
+dist/
+.cache/
+
+# ── Secrets & environment ─────────────────────────────────────────────────────
+.env
+.env.*
+*.env
+wrangler.toml
+.dev.vars
+secrets/
+
+# ── Backend source (stays in vnd-enhanced repo, not distributed here) ─────────
+backend/
+
+# ── Temporary / work-in-progress assets ──────────────────────────────────────
+assets/no usar.*
+assets/wip/
+assets/temp/
+
+# ── Release zips (generated, not committed) ───────────────────────────────────
+*.zip
+
+# ── Foundry runtime data that sometimes bleeds into module folders ────────────
+*.db
+*.db-journal
+packs/*.db

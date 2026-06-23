@@ -1,0 +1,240 @@
+<div class="sf-phone">
+
+  <!-- STATUS BAR -->
+  <div class="sf-status-bar sf-drag-handle">
+    <div class="sf-status-left">
+      <div class="sf-signal"><span class="sf-bar sf-bar--1"></span><span class="sf-bar sf-bar--2"></span><span class="sf-bar sf-bar--3"></span><span class="sf-bar sf-bar--4"></span></div>
+      <span class="sf-carrier">STARNET</span>
+    </div>
+    <div class="sf-status-center"><span class="sf-clock" id="sf-clock">{{time}}</span></div>
+    <div class="sf-status-right">
+      <span class="sf-user-tag">{{userName}}</span>
+      <div class="sf-battery"><div class="sf-battery-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- SCREEN -->
+  <div class="sf-screen">
+
+    <!-- ══ HOME ══ -->
+    <div class="sf-app sf-app-home {{#if (sfEq currentApp 'home')}}sf-app--active{{/if}}" data-app-id="home">
+      <div class="sf-home-header">
+        <img class="sf-avatar" src="{{userAvatar}}" alt="avatar">
+        <div class="sf-home-info">
+          <div class="sf-home-name">{{userName}}</div>
+          <div class="sf-home-status"><span class="sf-status-dot sf-status-dot--online"></span><span>CONNECTED</span></div>
+        </div>
+        <div class="sf-home-date">{{date}}</div>
+      </div>
+
+      <div class="sf-divider"></div>
+
+      <div class="sf-app-grid">
+        {{#each apps}}
+        <button class="sf-grid-icon" data-app="{{id}}" title="{{label}}">
+          <div class="sf-grid-icon-inner">{{{iconSvg}}}</div>
+          <span class="sf-grid-label">{{label}}</span>
+        </button>
+        {{/each}}
+      </div>
+
+      <div class="sf-divider"></div>
+
+      {{#if nowPlaying}}
+      <div class="sf-home-miniplayer" data-action="open-music">
+        <div class="sf-miniplayer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
+        <div class="sf-miniplayer-info">
+          <div class="sf-miniplayer-label">NOW PLAYING</div>
+          <div class="sf-miniplayer-track">{{nowPlaying.name}}</div>
+          <div class="sf-miniplayer-playlist">{{nowPlaying.playlistName}}</div>
+        </div>
+        <div class="sf-miniplayer-wave"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      {{else}}
+      <div class="sf-home-idle">
+        <div class="sf-idle-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <span>STARFINDER NETWORK</span>
+        <span class="sf-idle-sub">All systems nominal</span>
+      </div>
+      {{/if}}
+    </div>
+
+    <!-- ══ MUSIC ══ -->
+    <div class="sf-app sf-app-music {{#if (sfEq currentApp 'music')}}sf-app--active{{/if}}" data-app-id="music">
+      <div class="sf-app-header">
+        <button class="sf-back-btn" data-action="go-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <span class="sf-app-title">MUSIC PLAYER</span>
+        <div class="sf-header-spacer"></div>
+      </div>
+
+      {{#if nowPlaying}}
+      <div class="sf-music-cover-container">
+        <div class="sf-music-cover-ring sf-music-cover-ring--outer"></div>
+        <div class="sf-music-cover-ring sf-music-cover-ring--inner"></div>
+        <div class="sf-music-cover" id="sf-music-cover">
+          {{#if nowPlaying.img}}<img src="{{nowPlaying.img}}" alt="cover">
+          {{else}}<svg viewBox="0 0 80 80" fill="none" class="sf-music-default-art"><circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="1.5" opacity="0.3"/><circle cx="40" cy="40" r="25" stroke="currentColor" stroke-width="1.5" opacity="0.5"/><circle cx="40" cy="40" r="5" fill="currentColor" opacity="0.8"/></svg>
+          {{/if}}
+        </div>
+      </div>
+      <div class="sf-music-info">
+        <div class="sf-music-track" id="sf-track-name">{{nowPlaying.name}}</div>
+        <div class="sf-music-playlist" id="sf-playlist-name">{{nowPlaying.playlistName}}</div>
+      </div>
+      <div class="sf-progress-container">
+        <div class="sf-progress-bar">
+          <div class="sf-progress-fill" id="sf-progress-fill"></div>
+          <div class="sf-progress-dot" id="sf-progress-dot"></div>
+        </div>
+        <div class="sf-progress-times"><span id="sf-time-current">0:00</span><span id="sf-time-total">0:00</span></div>
+      </div>
+      {{else}}
+      <div class="sf-music-idle">
+        <div class="sf-music-idle-visual"><div class="sf-idle-bars"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="sf-music-idle-text">NO SIGNAL</div>
+        <div class="sf-music-idle-sub">Waiting for GM to play audio...</div>
+      </div>
+      {{/if}}
+
+      <div class="sf-music-controls">
+        <button class="sf-ctrl-btn sf-ctrl-btn--secondary" data-action="prev-track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+        <button class="sf-ctrl-btn sf-ctrl-btn--primary {{#if localMuted}}sf-ctrl-muted{{/if}}" data-action="toggle-mute" id="sf-play-btn">
+          {{#if localMuted}}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
+          {{else}}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          {{/if}}
+        </button>
+        <button class="sf-ctrl-btn sf-ctrl-btn--secondary" data-action="next-track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z"/></svg></button>
+      </div>
+
+      <div class="sf-volume-container">
+        <svg class="sf-vol-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.5 12A4.5 4.5 0 0 0 16 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/></svg>
+        <div class="sf-volume-slider-wrap">
+          <input type="range" class="sf-volume-slider" min="0" max="100" value="{{localVolume}}" data-action="local-volume">
+          <div class="sf-volume-track"><div class="sf-volume-fill" style="width:{{localVolume}}%"></div></div>
+        </div>
+        <span class="sf-vol-pct" id="sf-vol-pct">{{localVolume}}%</span>
+      </div>
+
+      {{#if tracks}}
+      <div class="sf-playlist-section">
+        <div class="sf-section-label">PLAYLISTS</div>
+        <div class="sf-playlist-list">
+          {{#each tracks}}
+          <div class="sf-playlist-item {{#if isPlaying}}sf-playlist-item--playing{{/if}}">
+            <div class="sf-playlist-indicator {{#if isPlaying}}sf-playing{{/if}}"></div>
+            <div class="sf-playlist-meta"><span class="sf-playlist-name">{{name}}</span><span class="sf-playlist-count">{{soundCount}} tracks</span></div>
+            {{#if isPlaying}}<div class="sf-playlist-wave"><span></span><span></span><span></span></div>{{/if}}
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+    </div>
+
+    <!-- ══ CONTACTS ══ -->
+    <div class="sf-app sf-app-contacts {{#if (sfEq currentApp 'contacts')}}sf-app--active{{/if}}" data-app-id="contacts">
+      <div class="sf-app-header">
+        <button class="sf-back-btn" data-action="go-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <span class="sf-app-title">CONTACTS</span>
+        <button class="sf-add-btn" data-action="add-contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+      <div class="sf-search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="sf-search-input" placeholder="Search contacts..." data-action="search-contacts">
+      </div>
+      <div class="sf-contact-list" id="sf-contact-list">
+        {{#if contacts.length}}
+          {{#each contacts}}
+          <div class="sf-contact-item" data-contact-id="{{id}}">
+            <div class="sf-contact-avatar-wrap">
+              <img class="sf-contact-avatar" src="{{img}}" onerror="this.src='icons/svg/mystery-man.svg'">
+              <span class="sf-contact-status-dot sf-contact-status-dot--{{status}}"></span>
+            </div>
+            <div class="sf-contact-info"><div class="sf-contact-name">{{name}}</div><div class="sf-contact-desc">{{description}}</div></div>
+            <div class="sf-contact-actions">
+              <span class="sf-contact-badge sf-contact-badge--{{status}}">{{statusLabel}}</span>
+              <button class="sf-contact-del" data-action="remove-contact" data-contact-id="{{id}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+          </div>
+          {{/each}}
+        {{else}}
+          <div class="sf-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><p>No contacts yet.</p><p class="sf-empty-sub">Tap + to add NPCs.</p></div>
+        {{/if}}
+      </div>
+    </div>
+
+    <!-- ══ BOUNTY NETWORK (lazy) ══ -->
+    <div class="sf-app sf-app-bounty {{#if (sfEq currentApp 'bounty')}}sf-app--active{{/if}}" data-app-id="bounty">
+      <div class="sf-app-header">
+        <button class="sf-back-btn" data-action="go-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <span class="sf-app-title">BOUNTY NETWORK</span>
+        <div class="sf-header-spacer"></div>
+      </div>
+      <div id="sf-lazy-bounty" class="sf-lazy-wrap"></div>
+    </div>
+
+    <!-- ══ NEWS TERMINAL (lazy) ══ -->
+    <div class="sf-app sf-app-news {{#if (sfEq currentApp 'news')}}sf-app--active{{/if}}" data-app-id="news">
+      <div class="sf-app-header">
+        <button class="sf-back-btn" data-action="go-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <span class="sf-app-title">NEWS TERMINAL</span>
+        <div class="sf-header-spacer"></div>
+      </div>
+      <div id="sf-lazy-news" class="sf-lazy-wrap"></div>
+    </div>
+
+    <!-- ══ CALENDAR (lazy) ══ -->
+    <div class="sf-app sf-app-calendar {{#if (sfEq currentApp 'calendar')}}sf-app--active{{/if}}" data-app-id="calendar">
+      <div class="sf-app-header">
+        <button class="sf-back-btn" data-action="go-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <span class="sf-app-title">CALENDAR</span>
+        <div class="sf-header-spacer"></div>
+      </div>
+      <div id="sf-lazy-calendar" class="sf-lazy-wrap"></div>
+    </div>
+
+    <!-- ══ SECURE COMMS / CHAT (lazy) ══ -->
+    <div class="sf-app sf-app-chat {{#if (sfEq currentApp 'chat')}}sf-app--active{{/if}}" data-app-id="chat">
+      <div id="sf-lazy-chat" class="sf-lazy-wrap sf-lazy-wrap--full"></div>
+    </div>
+
+    <!-- ══ MARKET / SHOP (lazy) ══ -->
+    <div class="sf-app sf-app-market {{#if (sfEq currentApp 'market')}}sf-app--active{{/if}}" data-app-id="market">
+      <div id="sf-lazy-market" class="sf-lazy-wrap sf-lazy-wrap--full"></div>
+    </div>
+
+    <!-- ══ FIELD JOURNAL (lazy) ══ -->
+    <div class="sf-app sf-app-journal {{#if (sfEq currentApp 'journal')}}sf-app--active{{/if}}" data-app-id="journal">
+      <div id="sf-lazy-journal" class="sf-lazy-wrap sf-lazy-wrap--full"></div>
+    </div>
+
+  </div>
+  <!-- END SCREEN -->
+
+  <!-- ══ SCREENSAVER ══ -->
+  <div class="sf-screensaver" id="sf-screensaver">
+    <video src="modules/starfinderdashboard/assets/no usar.mp4" loop muted playsinline preload="none"></video>
+    <div class="sf-screensaver-hint">TAP TO WAKE</div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="sf-nav-bar">
+    <button class="sf-nav-btn {{#if (sfEq currentApp 'home')}}sf-nav-btn--active{{/if}}" data-app="home" title="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="sf-nav-btn {{#if (sfEq currentApp 'music')}}sf-nav-btn--active{{/if}}" data-app="music" title="Music">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <span>Music</span>
+    </button>
+    <button class="sf-nav-btn {{#if (sfEq currentApp 'market')}}sf-nav-btn--active{{/if}}" data-app="market" title="Market">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>Market</span>
+    </button>
+    <button class="sf-nav-btn {{#if (sfEq currentApp 'chat')}}sf-nav-btn--active{{/if}}" data-app="chat" title="Comms">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Comms</span>
+    </button>
+  </div>
+
+</div>
