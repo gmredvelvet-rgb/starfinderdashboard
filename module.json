@@ -2,7 +2,7 @@
   "id": "starfinderdashboard",
   "title": "Starfinder Dashboard",
   "description": "A cyberpunk-style smartphone dashboard for FoundryVTT. Features a music player, NPC contacts, encrypted comms, news terminal, bounty network, calendar, shop, and journal — all inside a sleek sci-fi phone UI. Requires Patreon activation.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": {
     "minimum": "11",
     "verified": "12",
@@ -32,7 +32,7 @@
   "socket": false,
   "url": "https://github.com/gmredvelvet/starfinderdashboard",
   "manifest": "https://github.com/gmredvelvet/starfinderdashboard/releases/latest/download/module.json",
-  "download": "https://github.com/gmredvelvet/starfinderdashboard/releases/download/v1.0.0/starfinderdashboard.zip",
+  "download": "https://github.com/gmredvelvet/starfinderdashboard/releases/download/v1.0.1/starfinderdashboard.zip",
   "changelog": "https://github.com/gmredvelvet/starfinderdashboard/blob/main/CHANGELOG.md",
   "readme": "https://github.com/gmredvelvet/starfinderdashboard/blob/main/README.md",
   "bugs": "https://github.com/gmredvelvet/starfinderdashboard/issues",

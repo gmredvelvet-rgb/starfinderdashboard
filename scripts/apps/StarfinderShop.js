@@ -70,67 +70,99 @@ export class StarfinderShopApp {
   }
 
   // Find the actual field name for credits in the actor's currency object.
-  // sfrpg uses 'credit' (singular); other systems may use 'credits' or 'gp'.
+  // sfrpg uses 'credit' (singular); sf2e/pf2e vary by system version.
   _creditKey(actor) {
     const c     = actor?.system?.currency ?? {};
     const model = this._currencyModel(actor);
     const id    = game.system.id;
 
     if (id === 'sfrpg') {
-      // Prefer the key that actually exists on the data; sfrpg schema uses 'credit' (singular)
-      if ('credit'  in c)     return 'credit';
-      if ('credits' in c)     return 'credits';
+      if ('credit'  in c) return 'credit';
+      if ('credits' in c) return 'credits';
       if (model && 'credit'  in model) return 'credit';
       if (model && 'credits' in model) return 'credits';
-      return 'credit'; // canonical sfrpg field
+      return 'credit';
     }
+
     if (id === 'sf2e') {
-      if ('credits' in c)     return 'credits';
+      // Some SF2e builds expose an explicit 'credits' denomination.
+      if ('credits' in c) return 'credits';
       if (model && 'credits' in model) return 'credits';
-      return null; // sf2e uses sp/gp/pp fallback
+      // PF2e-derived SF2e stores credits as 'sp' (item prices also use sp=1 credit).
+      if ('sp' in c) return 'sp';
+      // Last resort: PF2e default primary denomination.
+      if ('gp' in c) return 'gp';
+      return 'sp'; // always return a concrete key — never null for sf2e
     }
+
     return null;
   }
 
   _getCredits(actor) {
     if (!actor) return 0;
-    const sys = actor.system;
-    const id  = game.system.id;
+    const sys      = actor.system;
+    const id       = game.system.id;
+    const invCoins = actor.inventory?.coins;
+
+    console.log('[SF Shop] _getCredits DEBUG ▼', {
+      systemId:           id,
+      actorName:          actor.name,
+      'system.currency':  sys?.currency,
+      'system.wealth':    sys?.wealth,
+      'inv.coins':        invCoins,
+      'inv.credits':      invCoins?.credits,
+      'inv.gp':           invCoins?.gp,
+      'inv.sp':           invCoins?.sp,
+    });
 
     if (id === 'sfrpg') {
-      const key = this._creditKey(actor);
-      return Number(sys?.currency?.[key] ?? 0);
+      const c = sys?.currency ?? {};
+      return Number(c.credit ?? c.credits ?? 0);
     }
 
-    // sf2e (Starfinder 2e) is built on PF2e — credits are stored as 'sp' (silver pieces)
-    // in actor.inventory.coins, NOT in system.currency.credits.
     if (id === 'sf2e') {
-      const invCoins = actor.inventory?.coins;
-      if (invCoins) return Number(invCoins.sp ?? 0);
-      return Number(sys?.currency?.sp ?? 0);
+      // sf2e (Starfinder 2e, built on PF2e) uses a single denomination.
+      // Try inventory.coins first with direct property access for each possible
+      // denomination key — avoids 'in' operator failures on Proxy/getter objects.
+      if (invCoins != null) {
+        for (const k of ['credits', 'gp', 'sp']) {
+          const v = Number(invCoins[k]);
+          if (v > 0) { console.log(`[SF Shop] sf2e via inventory.coins.${k}:`, v); return v; }
+        }
+      }
+      // Fallback: system.currency direct field check
+      const c = sys?.currency ?? {};
+      for (const k of ['credits', 'gp', 'sp']) {
+        const v = Number(c[k]);
+        if (v > 0) { console.log(`[SF Shop] sf2e via system.currency.${k}:`, v); return v; }
+      }
+      console.warn('[SF Shop] sf2e: credits=0 in all paths. currency:', sys?.currency, 'coins:', invCoins);
+      return 0;
     }
 
-    // PF2e also uses item-based coins; gp is the main denomination.
     if (id === 'pf2e') {
-      const invCoins = actor.inventory?.coins;
+      const currency = sys?.currency ?? {};
+      const sysTotal = Number(currency.pp ?? 0) * 10
+                     + Number(currency.gp ?? 0)
+                     + Number(currency.sp ?? 0) / 10
+                     + Number(currency.cp ?? 0) / 100;
+      if (sysTotal > 0) return sysTotal;
       if (invCoins) {
         return Number(invCoins.pp ?? 0) * 10
              + Number(invCoins.gp ?? 0)
              + Number(invCoins.sp ?? 0) / 10
              + Number(invCoins.cp ?? 0) / 100;
       }
-      return Number(sys?.currency?.gp ?? 0);
+      return 0;
     }
 
     // Generic: use game.model to discover currency fields dynamically
     const model = this._currencyModel(actor);
     const c     = sys?.currency ?? {};
     if (model) {
-      // Sum every field present in the schema; treat each unit as 1 credit
-      // (works for any single-denomination system; multi-denom systems handled above)
       return Object.keys(model).reduce((sum, k) => sum + (Number(c[k]) || 0), 0);
     }
-    // D&D 5e fallback — sum to gp-equivalent
+    // D&D 5e fallback
     const COIN_GP = { pp: 10, gp: 1, ep: 0.5, sp: 0.1, cp: 0.01 };
     return Object.entries(COIN_GP).reduce((sum, [k, v]) => sum + (Number(c[k] ?? 0) * v), 0);
   }
@@ -141,24 +173,32 @@ export class StarfinderShopApp {
     const id  = game.system.id;
 
     if (id === 'sfrpg') {
-      const key = this._creditKey(actor);
-      const cur = Number(sys?.currency?.[key] ?? 0);
+      const c   = sys?.currency ?? {};
+      const key = 'credit' in c ? 'credit' : 'credits';
+      const cur = Number(c[key] ?? 0);
       if (cur < amount) return false;
       await actor.update({ [`system.currency.${key}`]: cur - amount });
       return true;
     }
 
-    // sf2e: credits = sp in actor.inventory.coins.
-    // Use pf2e's removeCoins API (preferred) or fall back to direct update.
     if (id === 'sf2e') {
       const credits = this._getCredits(actor);
       if (credits < amount) return false;
+      // Detect which key actually holds credits — mirrors _getCredits scan order
+      const invCoins = actor.inventory?.coins;
+      const c   = sys?.currency ?? {};
+      let creditKey = 'credits';
+      for (const k of ['credits', 'gp', 'sp']) {
+        if ((invCoins != null && Number(invCoins[k]) > 0) || Number(c[k]) > 0) {
+          creditKey = k;
+          break;
+        }
+      }
       if (typeof actor.inventory?.removeCoins === 'function') {
-        const ok = await actor.inventory.removeCoins({ sp: amount });
+        const ok = await actor.inventory.removeCoins({ [creditKey]: amount });
         return ok !== false;
       }
-      // Fallback: direct field update
-      await actor.update({ 'system.currency.sp': Math.max(0, credits - amount) });
+      await actor.update({ [`system.currency.${creditKey}`]: Math.max(0, credits - amount) });
       return true;
     }
 

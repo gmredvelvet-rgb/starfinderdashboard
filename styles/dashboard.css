@@ -2810,3 +2810,14 @@
   animation: sf-j-flicker 4s ease infinite;
   pointer-events: none;
 }
+
+/* ── Foundry Dialog button text visibility fix ──────────────────────────────
+   sf2e/system CSS can inherit colors that make button labels invisible.
+   These selectors cover Foundry v11 (.dialog-button) and v12 (form-footer). */
+.dialog.window-app .dialog-buttons .dialog-button,
+.dialog.window-app .dialog-button,
+.dialog .dialog-buttons button,
+.application.dialog .form-footer button {
+  color: #e8e8e8 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
