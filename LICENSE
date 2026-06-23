@@ -1,0 +1,93 @@
+STARFINDER DASHBOARD — PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2024 GM RedVelvet (gmredvelvet@gmail.com)
+All rights reserved.
+
+DEFINITIONS
+
+"Software" refers to the Starfinder Dashboard module for Foundry VTT, including all
+source code, compiled code, assets, templates, stylesheets, scripts, and documentation
+contained in this repository or distributed as part of a release package.
+
+"Licensor" refers to GM RedVelvet, the copyright holder of the Software.
+
+"Licensee" refers to any individual or entity that has obtained a valid license to use
+the Software through an active paid subscription on the Licensor's Patreon page
+(https://www.patreon.com/gmredvelvet).
+
+GRANT OF LICENSE
+
+Subject to the terms of this License and the existence of an active paid subscription,
+the Licensor grants the Licensee a limited, non-exclusive, non-transferable,
+non-sublicensable license to:
+
+  1. Install and use the Software on Foundry VTT servers operated by the Licensee.
+  2. Use the Software for personal, private, or commercial tabletop roleplaying game
+     sessions hosted by the Licensee.
+
+RESTRICTIONS
+
+The Licensee may NOT, under any circumstances:
+
+  1. Redistribute, publish, upload, transmit, or otherwise make the Software available
+     to any third party, whether for free or for compensation.
+
+  2. Sell, rent, lease, sublicense, or transfer the Software or any license rights to
+     any third party.
+
+  3. Modify, adapt, translate, reverse-engineer, decompile, disassemble, or create
+     derivative works based on the Software, in whole or in part, except as strictly
+     permitted by applicable law that cannot be waived by contract.
+
+  4. Remove, alter, or obscure any copyright notice, trademark, watermark, license
+     key mechanism, activation system, or other proprietary notice contained in or
+     displayed by the Software.
+
+  5. Circumvent, disable, or otherwise interfere with the license verification or
+     activation mechanisms of the Software.
+
+  6. Use the Software to create a competing product or service.
+
+  7. Share login credentials, license keys, or Patreon access in a way that grants
+     unauthorized parties access to the Software.
+
+TERMINATION
+
+This License is effective until terminated. The Licensor may terminate this License
+immediately, without notice, if the Licensee breaches any provision of this License.
+Upon termination, the Licensee must cease all use of the Software and destroy all
+copies in their possession or control.
+
+This License also terminates automatically if the Licensee's paid subscription on the
+Licensor's Patreon page lapses or is cancelled.
+
+NO WARRANTIES
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NONINFRINGEMENT. THE LICENSOR MAKES NO GUARANTEE THAT THE
+SOFTWARE WILL BE FREE FROM DEFECTS, ERRORS, OR INTERRUPTIONS.
+
+LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, LOSS OF DATA,
+LOSS OF PROFITS, OR BUSINESS INTERRUPTION) ARISING OUT OF OR IN CONNECTION WITH
+THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES. THE LICENSOR'S TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT PAID BY
+THE LICENSEE FOR THE SOFTWARE IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.
+
+GOVERNING LAW
+
+This License shall be governed by and construed in accordance with the laws of the
+jurisdiction in which the Licensor resides, without regard to its conflict of law
+provisions. Any disputes arising under this License shall be subject to the exclusive
+jurisdiction of the courts in that jurisdiction.
+
+ENTIRE AGREEMENT
+
+This License constitutes the entire agreement between the parties with respect to the
+Software and supersedes all prior or contemporaneous communications and proposals,
+whether oral or written.
+
+For licensing inquiries, contact: gmredvelvet@gmail.com
