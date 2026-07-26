@@ -98,6 +98,30 @@ The license is stored at the world level. Players do not need individual Patreon
 
 ---
 
+## Licensing
+
+Starfinder Dashboard requires an active, qualifying **Patreon** subscription to [GM RedVelvet](https://www.patreon.com/gmredvelvet).
+
+**Only the GM authorises.** On their first load the GM is prompted to connect their Patreon account, which unlocks the module for everyone in the world. Players never see a prompt and never need an account of their own. If popups are blocked — common on phones — use the **auth-code** flow instead: connect on any device, copy the code, and paste it in.
+
+### What happens if the subscription lapses
+
+**Please read this before subscribing.** This is a subscription, not a one-off purchase, and the module re-checks it periodically against a licence server. Plainly:
+
+- **If the subscription lapses, the module stops working.** The dashboard is no longer available.
+- **Nothing else is affected.** Foundry, your world, your actors, your journals and your settings are untouched. Anything you configured stays where it is — no data is altered, withheld or lost, and no content becomes unopenable. Resubscribing turns it straight back on.
+- **An internet connection is required while playing.** Verification is periodic, so a client that cannot reach the licence server deactivates the module until it can. Fully offline or air-gapped games are not supported.
+
+If a perpetual licence is what you need, this is not that today. I would rather say so here than have anyone find out mid-campaign.
+
+## FAQ
+
+**Do my players need their own subscription?**
+No. Only the GM authorises, and that unlocks the world for everyone connected.
+
+**Can I use it offline?**
+No. The licence is verified periodically over the internet, and a client that cannot reach the licence server deactivates the module until it can.
+
 ## Legal
 
 Copyright © 2024 GM RedVelvet. All rights reserved.  
