@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        id: ver
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      # The tag is the single source of truth for the version, so a release
+      # can never ship a manifest that disagrees with it.
+      - name: Update module.json version
+        run: |
+          sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.ver.outputs.VERSION }}\"/" module.json
+
+      - name: Verify manifest
+        run: |
+          node -e "
+            const m = require('./module.json');
+            const fs = require('fs');
+            const tag = '${{ steps.ver.outputs.VERSION }}';
+            const fail = (msg) => { throw new Error(msg); };
+
+            if (m.version !== tag) fail('version mismatch: ' + m.version + ' != ' + tag);
+            if (!/^[a-z0-9-]+$/.test(m.id)) fail('id must be lowercase/hyphen: ' + m.id);
+            if (m.id !== 'starfinderdashboard') fail('id must equal folder name: ' + m.id);
+            if (!m.compatibility || !m.compatibility.minimum) fail('compatibility.minimum required');
+            for (const k of ['title','description','manifest','download']) {
+              if (!m[k]) fail('missing required field: ' + k);
+            }
+            for (const url of [m.manifest, m.download]) {
+              if (!/releases\/latest\/download\//.test(url)) fail('manifest/download must use releases/latest/download: ' + url);
+            }
+            const files = [...(m.esmodules||[]), ...(m.scripts||[]), ...(m.styles||[]), ...(m.languages||[]).map(l => l.path)];
+            for (const f of files) {
+              if (!fs.existsSync(f)) fail('missing referenced file: ' + f);
+            }
+            console.log('manifest OK — v' + m.version + ' (' + files.length + ' referenced files present)');
+          "
+
+      # Pull just this version's section out of the changelog so the GitHub
+      # Release body is the notes for THIS release, not the entire history.
+      # Headings are Keep-a-Changelog style ("## [3.0.0] — date"); matching by
+      # literal prefix rather than a regex keeps the bracket from being read
+      # as a character class once shell and YAML have had their turn.
+      - name: Extract release notes
+        run: |
+          awk -v ver="${{ steps.ver.outputs.VERSION }}" '
+            !grab && (index($0, "## " ver) == 1 || index($0, "## [" ver "]") == 1) { grab=1; print; next }
+            grab && index($0, "## ") == 1 { exit }
+            grab { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "Starfinder Dashboard v${{ steps.ver.outputs.VERSION }}" > RELEASE_NOTES.md
+            echo "" >> RELEASE_NOTES.md
+            echo "See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)." >> RELEASE_NOTES.md
+          fi
+
+      - name: Build module.zip
+        run: |
+          zip -r module.zip . \
+            --exclude "*.git*" \
+            --exclude ".github/*" \
+            --exclude "*.code-workspace" \
+            --exclude "RELEASE_NOTES.md" \
+            --exclude "module.zip"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Starfinder Dashboard v${{ steps.ver.outputs.VERSION }}"
+          tag_name: ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
+          files: |
+            module.zip
+            module.json
+          token: ${{ secrets.GITHUB_TOKEN }}
