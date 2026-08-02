@@ -56,15 +56,23 @@ jobs:
       # as a character class once shell and YAML have had their turn.
       - name: Extract release notes
         run: |
+          # A module without a changelog is fine; awk on a missing file is not
+          # (it exits non-zero and takes the whole release down with it).
+          if [ -f CHANGELOG.md ]; then
           awk -v ver="${{ steps.ver.outputs.VERSION }}" '
             !grab && (index($0, "## " ver) == 1 || index($0, "## [" ver "]") == 1) { grab=1; print; next }
             grab && index($0, "## ") == 1 { exit }
             grab { print }
           ' CHANGELOG.md > RELEASE_NOTES.md
+          fi
           if [ ! -s RELEASE_NOTES.md ]; then
             echo "Starfinder Dashboard v${{ steps.ver.outputs.VERSION }}" > RELEASE_NOTES.md
             echo "" >> RELEASE_NOTES.md
-            echo "See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)." >> RELEASE_NOTES.md
+            if [ -f CHANGELOG.md ]; then
+              echo "See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)." >> RELEASE_NOTES.md
+            else
+              echo "See the [commit history](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }})." >> RELEASE_NOTES.md
+            fi
           fi
 
       - name: Build module.zip
