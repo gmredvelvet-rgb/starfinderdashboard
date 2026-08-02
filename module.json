@@ -2,7 +2,7 @@
   "id": "starfinderdashboard",
   "title": "Starfinder Dashboard",
   "description": "A cyberpunk-style smartphone dashboard for FoundryVTT. Features a music player, NPC contacts, encrypted comms, news terminal, bounty network, calendar, shop, and journal — all inside a sleek sci-fi phone UI. Requires Patreon activation.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "compatibility": {
     "minimum": "11",
     "verified": "12",
