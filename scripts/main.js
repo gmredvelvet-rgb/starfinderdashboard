@@ -5,6 +5,7 @@ import { SFCalendarApp         } from './apps/SFCalendar.js';
 import { StarfinderShopApp     } from './apps/StarfinderShop.js';
 import { StarfinderJournalApp  } from './apps/StarfinderJournal.js';
 import { SFDashboardLicenseClient, SFDashboardLicenseUI } from './license-client.js';
+import { isModuleLicensed, licenseHub } from './license-hub.js';
 
 const MODULE_ID = 'starfinderdashboard';
 
@@ -128,7 +129,12 @@ function _activateDashboard() {
 // Async so the license check completes before VNE-style activation logic reads
 // the worldLicensed setting at the bottom of this hook.
 Hooks.once('setup', async () => {
-  if (game.user?.isGM) {
+  // With Velvet License Hub active the licence is the hub's: register, and
+  // leave the dashboard's own client alone. The hub's API and settings exist
+  // from its init, so its verdict can already be read here.
+  const hub = licenseHub(2);
+  if (hub) hub.register(MODULE_ID);
+  else if (game.user?.isGM) {
     const licensed = await SFDashboardLicenseClient.instance.initialize();
     if (licensed) {
       try { await game.settings.set(MODULE_ID, 'worldLicensed', true); } catch { /* ignore */ }
@@ -138,8 +144,7 @@ Hooks.once('setup', async () => {
     }
   }
 
-  const worldLicensed = game.settings.get(MODULE_ID, 'worldLicensed') ?? false;
-  if (!worldLicensed) return;
+  if (!isModuleLicensed(MODULE_ID)) return;
 
   _activateDashboard();
 });
@@ -147,8 +152,7 @@ Hooks.once('setup', async () => {
 // ─── Ready: FAB toggle button + encrypted whisper UI ─────────────────────────
 Hooks.once('ready', () => {
   // Re-check in case setup's async completed after worldLicensed was written
-  const worldLicensed = game.settings.get(MODULE_ID, 'worldLicensed') ?? false;
-  if (worldLicensed && !_activated) _activateDashboard();
+  if (isModuleLicensed(MODULE_ID) && !_activated) _activateDashboard();
 });
 
 // ─── Mid-session activation when GM connects Patreon ─────────────────────────
@@ -163,9 +167,12 @@ Hooks.on('starfinderdashboard.activate', () => {
 });
 
 // All other clients receive the worldLicensed = true via updateSetting
+// The hub's verdict arrives the same way, under its own key — a GM connecting
+// mid-session, or a new world opened from a browser that is already connected,
+// where the hub publishes in ready, after setup has decided.
 Hooks.on('updateSetting', (setting) => {
-  if (setting.key === `${MODULE_ID}.worldLicensed`) {
-    if (game.settings.get(MODULE_ID, 'worldLicensed') === true && !_activated) {
+  if (setting.key === `${MODULE_ID}.worldLicensed` || setting.key === 'velvet-license-hub.worldLicence') {
+    if (isModuleLicensed(MODULE_ID) && !_activated) {
       document.getElementById('sf-license-prompt')?.remove();
       _activateDashboard();
     }
@@ -176,7 +183,7 @@ Hooks.on('updateSetting', (setting) => {
 Hooks.on('renderPlayerList', (app, html) => {
   if (html.find('#sf-dashboard-toggle').length) return;
 
-  const worldLicensed = game.settings.get(MODULE_ID, 'worldLicensed') ?? false;
+  const worldLicensed = isModuleLicensed(MODULE_ID);
   const btnTitle  = worldLicensed ? 'Toggle Starfinder Dashboard' : 'Starfinder Dashboard — Patreon required';
   const btnBorder = worldLicensed ? 'rgba(0,229,255,0.4)' : 'rgba(255,100,100,0.3)';
   const btnColor  = worldLicensed ? '#00e5ff' : '#804040';
@@ -203,9 +210,12 @@ Hooks.on('renderPlayerList', (app, html) => {
   `);
 
   btn.on('click', () => {
-    const licensed = game.settings.get(MODULE_ID, 'worldLicensed') ?? false;
-    if (!licensed) {
-      if (game.user?.isGM) SFDashboardLicenseUI.show();
+    if (!isModuleLicensed(MODULE_ID)) {
+      if (game.user?.isGM) {
+        const hub = licenseHub();
+        if (hub) hub.openLicenseCard();
+        else SFDashboardLicenseUI.show();
+      }
       return;
     }
     sfDashboard?.toggle?.();
